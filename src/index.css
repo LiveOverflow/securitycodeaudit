@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.content {
+  @apply pt-14 lg:pt-2 pb-12 px-4 mx-auto max-w-screen-xl w-full text-white;
+}
