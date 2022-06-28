@@ -27,6 +27,12 @@ const routerOptions = {
       component: () => import("../views/ChallengeView.vue"),
       props: true,
     },
+    {
+      path: "/idor",
+      name: "idor",
+      component: () => import("../views/IdorView.vue"),
+      props: true,
+    },
   ],
 };
 

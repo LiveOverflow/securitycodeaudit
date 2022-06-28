@@ -10,9 +10,14 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "bigint-base-converter": "^0.1.3",
+    "bigint-factorial": "^1.1.3",
     "highlight.js": "^11.5.1",
+    "humanize-duration": "^3.27.2",
+    "mathjax-vue3": "^1.0.1",
     "vue": "^3.2.37",
-    "vue-router": "^4.0.16"
+    "vue-router": "^4.0.16",
+    "vue3-slider": "^1.7.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.0",

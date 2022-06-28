@@ -5,8 +5,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
-    //"lib": ["es2017.object"]
+    },
+    "lib": ["es2020"]
   },
 
   "references": [
