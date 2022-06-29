@@ -19,6 +19,9 @@ module.exports = {
       screens: {
         fixmobile: { raw: "(hover: hover)" },
       },
+      dropShadow: {
+        '2xlstrong': '0 25px 25px rgba(0, 0, 0, 0.5)',
+      }
     },
     colors: {
       transparent: "transparent",

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import HomeView from "../views/HomeView.vue";
+import BaseView from "../views/BaseView.vue";
 
 const routerOptions = {
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,7 +9,7 @@ const routerOptions = {
     {
       path: "/",
       name: "home",
-      component: HomeView,
+      component: BaseView,
       children: [
         {
           path: "about",
@@ -19,18 +20,18 @@ const routerOptions = {
           component: () => import("../views/AboutView.vue"),
           props: true,
         },
+        {
+          path: "/idor",
+          name: "idor",
+          component: () => import("../views/IdorView.vue"),
+          props: true,
+        },
       ],
     },
     {
       path: "/path/:path/:page",
       name: "path",
       component: () => import("../views/ChallengeView.vue"),
-      props: true,
-    },
-    {
-      path: "/idor",
-      name: "idor",
-      component: () => import("../views/IdorView.vue"),
       props: true,
     },
   ],

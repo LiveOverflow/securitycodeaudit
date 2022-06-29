@@ -1,213 +1,429 @@
 <template>
   <div class="text-white p-5 w-full">
-    <h1>IDOR Vuln Calculator</h1>
-    <div>
-      <button
-        class="bg-green px-3 py-1 rounded rouned-lg m-1 border-1 border-green hover:border-white"
-        v-for="e in Object.keys(examples)"
-        @click="examples[e]()"
-        :key="e"
-      >
-        {{ e }}
-      </button>
-    </div>
-    <div class="my-5">
-      length <span class="text-green font-bold">{{ length }}</span>
-      <div class="w-1/2">
-        <slider
-          v-model="length"
-          :max="max_length"
-          :min="1"
-          :tooltip="true"
-          tooltipText="length %v"
-          :height="8"
-          :sticky="true"
-          :color="tailwindcss.theme.colors['green']"
-          :track-color="tailwindcss.theme.colors['dark']"
-        />
-      </div>
-    </div>
-
+    <h1 class="text-xl font-bold">IDOR Vuln Calculator</h1>
     <div
-      class="ml-2 my-2 border border-white inline-block p-2 rounded rounded-lg opacity-20 transition duration-200 hover:opacity-100"
+      class="text-white float-right cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100"
+      @click="showSettings = true"
     >
-      <b>Advanced Settings</b>
-      <div>
-        max length
-        <input
-          type="number"
-          class="bg-dark px-1 my-1 w-12"
-          v-model="max_length"
-        />
-      </div>
-      <div>
-        start value
-        <input
-          class="bg-dark px-1 my-1 w-32"
-          type="text"
-          v-model="start_value_str"
-        />
-      </div>
-      
-    <div>
-      certainty
-
-      <div class="w-full">
-        <slider
-          v-model="target_certainty"
-          :step="0.01"
-          :min="0.01"
-          :max="0.99"
-          :tooltip="true"
-          :formatTooltip="(n: number) => `${Math.ceil(n*100)}% certainty`"
-          :height="8"
-          :sticky="true"
-          :color="tailwindcss.theme.colors['green']"
-          :track-color="tailwindcss.theme.colors['dark']"
-        />
-      </div>
+      <i class="fa-solid fa-gear"></i>
     </div>
-    </div>
-    <div class="mt-5">
-      alphabet size
-      <span class="text-green font-bold">{{ alphabet.length }}</span>
-      <br />
-      <input
-        class="bg-darker px-1 my-1 w-full font-mono text-white text-opacity-50 focus:text-opacity-100"
-        type="text"
-        v-model="alphabet"
-        @input="
-          () => {
-            alphabet = uniqueChars(alphabet);
-          }
-        "
-      />
 
-      <div>
-        <button
-          class="px-3 py-1 rounded rouned-lg m-1 border-2 hover:border-white"
-          :class="{
-            'bg-green border-green': alphabet == alphabet_preset[alphabet_name],
-            'bg-dark border-dark': alphabet != alphabet_preset[alphabet_name],
-          }"
-          v-for="alphabet_name in Object.keys(alphabet_preset)"
-          @click="setAlphabet(alphabet_preset[alphabet_name])"
+    <OverlayBlock
+      v-if="showSettings"
+      @clickClose="() => (showSettings = false)"
+    >
+      <b
+        ><i class="fa-solid fa-gear text-white text-opacity-50 mr-3"></i>
+        Advanced Settings</b
+      >
+      <div class="grid grid-cols-2 content-center mt-5">
+        <div class="text-sm font-medium sm:mt-px sm:pt-2 pr-10">
+          Slider Max ID Length
+        </div>
+        <div>
+          <input
+            type="number"
+            class="bg-darker w-full text-right rounded-md px-2 py-1"
+            v-model="max_length"
+          />
+        </div>
+        <div class="text-sm font-medium sm:mt-px sm:pt-2 pr-10">
+          Start Value
+        </div>
+        <div class="sm:pt-2">
+          <input
+            type="number"
+            class="bg-darker w-full text-right rounded-md px-2 py-1"
+            v-model="start_value_str"
+          />
+        </div>
+        <div class="text-sm font-medium sm:mt-px sm:pt-2 pr-10">
+          Certainty (<span class="text-green font-bold"
+            >{{ Math.ceil(target_certainty * 100) }}%</span
+          >)
+        </div>
+        <div class="flex items-center sm:pt-2">
+          <div class="flex flex-row whitespace-nowrap">
+            <span class="font-bold">1%</span>
+            <input
+              type="range"
+              class="mx-2 accent-green w-full transition-all"
+              min="0.01"
+              step="0.01"
+              max="0.99"
+              v-model.number="target_certainty"
+            />
+            <span class="font-bold">99%</span>
+          </div>
+        </div>
+      </div>
+    </OverlayBlock>
+
+    <div class="mt-12">
+      <div class="sm:hidden bg-dark rounded rounded-lg px-3 py-2 flex flex-row items-center">
+        <label for="tabs" class="sr-only">Select a tab</label>
+        <!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
+        Current View:
+        <select
+        v-model="showTab"
+          id="tabs"
+          name="tabs"
+          class=" flex-grow ml-2 focus:ring-green focus:border-green border-dark rounded-md bg-darker px-1 py-1"
         >
-          {{ alphabet_name }}
-        </button>
+          <option :value="1">IDOR Calculator</option>
+          <option :value="2">Browse Examples</option>
+        </select>
       </div>
-    </div>
-    <div class="mt-5">
-      <div>
-        <span class="text-green font-bold">{{ maxNumber }}</span> Possibilities
-      </div>
-      <div class="my-2">
-        <div class=" my-2 flex flex-wrap">
-          
-        Example values:
-            <div v-for="(x, i) in new Array(5)" class="font-mono mx-2 text-white text-opacity-50">
-              {{
-                dec2base(
-                  start_value + randBigInt2(maxNumber - start_value)
-                ).padStart(length, alphabet[0])
-              }}
-            </div>
+      <div class="hidden sm:block">
+        <div class="border-b border-dark">
+          <nav class="-mb-px flex" aria-label="Tabs">
+            <a
+              @click="showTab = 1"
+              :class="[
+                showTab == 1
+                  ? 'border-green text-green bg-dark'
+                  : 'border-transparent text-white text-opacity-50 hover:text-opacity-100 hover:border-green',
+                'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm cursor-pointer rounded-t rounded-t-lg',
+              ]"
+              :aria-current="showTab == 1 ? 'page' : undefined"
+            >
+              IDOR Calculator
+            </a>
+            <a
+              @click="showTab = 2"
+              :class="[
+                showTab == 2
+                  ? 'border-green text-green bg-dark'
+                  : 'border-transparent text-white text-opacity-50 hover:text-opacity-100 hover:border-green',
+                'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm cursor-pointer rounded-t rounded-t-lg',
+              ]"
+              :aria-current="showTab == 2 ? 'page' : undefined"
+            >
+              Browse Examples
+            </a>
+          </nav>
         </div>
       </div>
     </div>
-    <div>
-      source ratelimit
-      <input
-        type="number"
-        class="bg-dark text-right px-1 w-24"
-        v-model="ip_ratelimit_requests"
-      />
-      requests/s (per computer/ip/device)
-    </div>
-    <div>
-      target ratelimit
-      <input
-        type="number"
-        class="bg-dark text-right px-1 w-24"
-        v-model="target_ratelimit_requests"
-      />
-      requests/s (per account/target/device)
-    </div>
-    <div>
-      correct guesses
-      <input class="bg-dark w-24" type="number" v-model="correct_guesses" />
-    </div>
-    <div>
-      threat multiplier
 
-      <div class="w-1/2">
-        <slider
-          v-model="threat_multiplier"
-          :step="0.01"
-          :min="0.01"
-          :max="10"
-          :tooltip="true"
-          :formatTooltip="(n: number) => `threat ${Math.round(n*100)/100}x`"
-          :height="8"
-          :sticky="true"
-          :color="tailwindcss.theme.colors['red']"
-          :track-color="tailwindcss.theme.colors['dark']"
-        />
+    <div v-if="showTab == 2">
+      <div>
+        <button
+          class="bg-green px-3 py-1 rounded rouned-lg m-1 border-1 border-green hover:border-white"
+          v-for="e in Object.keys(examples)"
+          @click="examples[e]()"
+          :key="e"
+        >
+          {{ e }}
+        </button>
       </div>
     </div>
-    <div>
-      <label>
-        <input type="checkbox" v-model="notify_victim" />
-        attempts notifies victims
-      </label>
 
-      <label>
-        <input type="checkbox" v-model="online" />
-        online attack
-      </label>
-      <label>
-        <input type="checkbox" v-model="lockout" />
-        lockout
-      </label>
-    </div>
-    <div class="flex">
-      <div class="bg-dark rounded rounded-lg p-5 mt-5">
-      <div>
-        You need <span class="text-green font-bold">{{ Math.ceil(binominal_distribution) }} attempts</span> to find
-        one with {{ Math.floor(target_certainty * 100) }}% if every time it's
-        random.
-      </div>
-      <div>
-        You need <span class="text-green font-bold">{{ Math.ceil(hypergeometric_distribution) }} attempts</span> to
-        find one with {{ Math.floor(target_certainty * 100) }}% if we search a
-        set.
-      </div>
-      <div class="mt-2">
-        Current threat level considers it "bad" when you succeed in under <span class="text-green font-bold">{{
-            humanizeDuration(threshold, {
-              largest: 1,
-              round: true,
-            })
-        }}</span>
-        
-      </div>
-    </div>
-    </div>
-    <div>
-    <div class="flex flex-wrap">
-        <AttackerItem
+    <div v-if="showTab == 1">
+      <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+        <div
+          class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-dark sm:pt-5"
+        >
+          <label
+            for="username"
+            class="block text-sm font-medium sm:mt-px sm:pt-2"
+          >
+            ID Length (<span class="text-green font-bold">{{ length }}</span
+            >)
+            
+            </label
+          >
+          <div class="mt-1 sm:mt-0 sm:col-span-2">
+            <div class="flex flex-row whitespace-nowrap">
+              <span class="font-bold">2</span>
+              <input
+                type="range"
+                class="mx-2 accent-green w-full md:w-1/2 transition-all"
+                min="2"
+                step="1"
+                :max="max_length"
+                v-model="length"
+              />
+              <span class="font-bold">{{ max_length }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
+        >
+          <label for="about" class="block text-sm font-medium sm:mt-px sm:pt-2">
+            Alphabet (<span class="text-green font-bold">{{
+              alphabet.length
+            }}</span>
+            characters)
+          </label>
+          <div class="mt-1 sm:mt-0 sm:col-span-2">
+            <input
+              class="bg-darker px-1 my-1 w-full font-mono text-white text-opacity-50 focus:text-opacity-100"
+              type="text"
+              v-model="alphabet"
+              @input="
+                () => {
+                  alphabet = uniqueChars(alphabet);
+                }
+              "
+            />
+            <p class="my-2 text-sm text-gray-500">
+              The characters used for the identifier. You can also select a
+              preset:
+            </p>
+            <div>
+              <button
+                class="px-3 py-1 rounded rouned-lg m-1 border-2 hover:border-white"
+                :class="{
+                  'bg-green border-green':
+                    alphabet == alphabet_preset[alphabet_name],
+                  'bg-dark border-dark':
+                    alphabet != alphabet_preset[alphabet_name],
+                }"
+                v-for="alphabet_name in Object.keys(alphabet_preset)"
+                @click="setAlphabet(alphabet_preset[alphabet_name])"
+              >
+                {{ alphabet_name }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
+        >
+          <div
+            class="bg-dark sm:col-span-5 md:col-start-2 md:col-end-5 rounded rounded-lg p-5"
+          >
+            <div>
+              There are
+              <span class="text-green font-bold">{{ maxNumber }}</span>
+              possible IDs.
+            </div>
+            <div class="my-2">
+              Here are some example ID values:
+              <div class="my-2 flex flex-wrap max-h-12 overflow-hidden">
+                <div
+                  v-for="(x, i) in new Array(Math.ceil(200 / length))"
+                  :key="i"
+                  class="font-mono mr-2 text-white text-opacity-50"
+                >
+                  {{
+                    dec2base(
+                      start_value + randBigInt2(maxNumber - start_value)
+                    ).padStart(length, alphabet[0])
+                  }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
+        >
+          <label
+            for="username"
+            class="block text-sm font-medium sm:mt-px sm:pt-2"
+          >
+            Correct Guesses
+          </label>
+          <div class="mt-1 sm:mt-0 sm:col-span-2">
+            <input
+              class="bg-dark w-36 text-right rounded-md px-2 py-1"
+              type="number"
+              v-model.bigint="correct_guesses"
+            />
+            <p class="mt-2 text-sm text-gray-500">
+              Select how many of the
+              <span class="text-green font-bold">{{ maxNumber }}</span>
+              possibilities actually exist and could be found.
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
+        >
+          <label
+            for="username"
+            class="block text-sm font-medium sm:mt-px sm:pt-2"
+          >
+            Threat Multiplier (<span
+              class="text-green font-bold"
+              v-if="threat_multiplier < 2"
+              >Not Critical</span
+            ><span
+              class="text-yellow font-bold"
+              v-else-if="threat_multiplier < 5"
+              >Somewhat Critical</span
+            ><span class="text-red font-bold" v-else>Very Critical</span>)
+          </label>
+          <div class="mt-1 sm:mt-0 sm:col-span-2">
+            <div class="flex flex-row whitespace-nowrap">
+              <span class="text-green font-bold">Not Critical</span>
+              <input
+                type="range"
+                class="mx-2 accent-green w-full md:w-1/2 transition-all"
+                :class="{
+                  'accent-green': threat_multiplier < 2,
+                  'accent-yellow':
+                    threat_multiplier >= 2 && threat_multiplier < 5,
+                  'accent-red': threat_multiplier >= 5,
+                }"
+                min="0.01"
+                step="0.01"
+                max="10"
+                v-model="threat_multiplier"
+              />
+              <span class="text-red font-bold">Very Critical</span>
+            </div>
+            <p class="mt-2 text-sm text-gray-500">
+              How critical is the data you try to access?
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
+        >
+          <label
+            for="username"
+            class="block text-sm font-medium sm:mt-px sm:pt-2"
+          >
+            Additional Context
+          </label>
+          <div class="mt-1 sm:mt-0 sm:col-span-2">
+            <div class="max-w-lg space-y-4">
+              <div class="relative flex items-start">
+                <div class="flex items-center h-5">
+                  <input
+                    id="comments"
+                    v-model="notify_victim"
+                    name="comments"
+                    type="checkbox"
+                    class="focus:ring-green accent-green text-dark h-4 w-4 text-green border-dark rounded"
+                  />
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="comments" class="font-medium"
+                    >Victim Notification</label
+                  >
+                  <p class="text-gray-500">
+                    Does attacking alert the victim? eg. trigger mail, SMS, ...
+                  </p>
+                </div>
+              </div>
+              <div>
+                <div class="relative flex items-start">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="candidates"
+                      name="candidates"
+                      v-model="online"
+                      type="checkbox"
+                      class="focus:ring-green accent-green text-dark h-4 w-4 text-green border-dark rounded"
+                    />
+                  </div>
+                  <div class="ml-3 text-sm">
+                    <label for="candidates" class="font-medium"
+                      >Online Attack</label
+                    >
+                    <p class="text-gray-500">
+                      Is this attack done over the internet or locally?
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="relative flex items-start">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="offers"
+                      name="offers"
+                      type="checkbox"
+                      v-model="lockout"
+                      class="focus:ring-green accent-green text-dark h-4 w-4 text-green border-dark rounded"
+                    />
+                  </div>
+                  <div class="ml-3 text-sm">
+                    <label for="offers" class="font-medium">Lockout</label>
+                    <p class="text-gray-500">
+                      Is the target system/account locked after some attempts?
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div
+          class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
+        >
+          <h1 class="text-lg font-bold">Results</h1>
+        </div>
+
+        <div
+          class="sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start  sm:pt-5"
+        >
+          <div
+            class="bg-dark sm:col-span-5 md:col-start-2 md:col-end-5 rounded rounded-lg p-5"
+          >
+            <div>
+              If every attempt is random, to find one with
+              <i>{{ Math.floor(target_certainty * 100) }}%</i> certainty, you
+              need
+              <span class="text-green font-bold"
+                >{{ Math.ceil(binominal_distribution) }} attempts</span
+              >.
+            </div>
+            <div>
+              If you search in a set, to find a specific one with
+              <i>{{ Math.floor(target_certainty * 100) }}%</i> certainty, you
+              need
+              <span class="text-green font-bold"
+                >{{ Math.ceil(hypergeometric_distribution) }} attempts</span
+              >.
+            </div>
+            <div class="mt-2">
+              With the current threat level it's considered "bad" when your
+              attempts succeed in under
+              <span class="text-green font-bold">{{
+                humanizeDuration(threshold, {
+                  largest: 1,
+                  round: true,
+                })
+              }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4 sm:items-start  sm:pt-5"
+        >
+          <h1 class="text-md font-bold">Simulated Attackers</h1>
+        </div>
+
+        <div
+          class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4 sm:items-start sm:pt-5"
+        >
+          <AttackerItem
             v-if="online"
             :binominal_distribution="binominal_distribution"
             :target_certainty="target_certainty"
             :hypergeometric_distribution="hypergeometric_distribution"
             :threshold="threshold"
-            :requestsPerMs="5/1000"
+            :requestsPerMs="5 / 1000"
             :notify_victim="notify_victim"
             :lockout="lockout"
             name="Lazy Hacker"
             description="A simple python script"
-        />
-        <AttackerItem
+          />
+          <AttackerItem
             v-if="online"
             :binominal_distribution="binominal_distribution"
             :target_certainty="target_certainty"
@@ -215,11 +431,11 @@
             :threshold="threshold"
             :notify_victim="notify_victim"
             :lockout="lockout"
-            :requestsPerMs="200/1000"
+            :requestsPerMs="200 / 1000"
             name="Script Kiddie"
             description="Hacker with an optimized script over the internet"
-        />
-        <AttackerItem
+          />
+          <AttackerItem
             v-if="online"
             :binominal_distribution="binominal_distribution"
             :target_certainty="target_certainty"
@@ -227,11 +443,11 @@
             :threshold="threshold"
             :notify_victim="notify_victim"
             :lockout="lockout"
-            :requestsPerMs="1000/1000"
+            :requestsPerMs="1000 / 1000"
             name="Prepared Attacker"
             description="Hacker renting server in close prxomity (same region or data center)"
-        />
-        <AttackerItem
+          />
+          <AttackerItem
             v-if="online"
             :binominal_distribution="binominal_distribution"
             :target_certainty="target_certainty"
@@ -239,12 +455,12 @@
             :threshold="threshold"
             :notify_victim="notify_victim"
             :lockout="lockout"
-            :requestsPerMs="100000/1000"
+            :requestsPerMs="100000 / 1000"
             name="Performance Nerd"
             description="Owning IP ranges and lots of servers"
-        />
-        
-        <AttackerItem
+          />
+
+          <AttackerItem
             v-if="!online"
             :binominal_distribution="binominal_distribution"
             :target_certainty="target_certainty"
@@ -252,11 +468,11 @@
             :threshold="threshold"
             :notify_victim="notify_victim"
             :lockout="lockout"
-            :requestsPerMs="1/10000"
+            :requestsPerMs="1 / 10000"
             name="Opportunistic Thief"
             description="A thief who performs some attempts by hand"
-        />
-        <AttackerItem
+          />
+          <AttackerItem
             v-if="!online"
             :binominal_distribution="binominal_distribution"
             :target_certainty="target_certainty"
@@ -264,11 +480,11 @@
             :threshold="threshold"
             :notify_victim="notify_victim"
             :lockout="lockout"
-            :requestsPerMs="2/1000"
+            :requestsPerMs="2 / 1000"
             name="Automation"
             description="Device that automatically tests inputs"
-        />
-        <AttackerItem
+          />
+          <AttackerItem
             v-if="!online"
             :binominal_distribution="binominal_distribution"
             :target_certainty="target_certainty"
@@ -276,11 +492,12 @@
             :threshold="threshold"
             :notify_victim="notify_victim"
             :lockout="lockout"
-            :requestsPerMs="10000/1000"
+            :requestsPerMs="10000 / 1000"
             name="Hardware Hacker"
             description="Specialized tooling and parallelism"
-        />
-    </div>
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -291,12 +508,14 @@ import factorial from "bigint-factorial";
 import humanizeDuration from "humanize-duration";
 import slider from "vue3-slider";
 import AttackerItem from "../components/AttackerItem.vue";
+import OverlayBlock from "../components/OverlayBlock.vue";
 
 export default defineComponent({
   props: {},
   setup(props) {
     const length = ref(6);
-    const max_length = ref(16);
+    const showTab = ref(1);
+    const max_length = ref(32);
     const nr_requests = ref(3000);
     const ip_ratelimit_requests = ref(3000);
     const target_ratelimit_requests = ref(3000);
@@ -308,37 +527,38 @@ export default defineComponent({
     const target_certainty = ref(0.95);
     const threat_multiplier = ref(1);
     const lockout = ref(false);
+    const showSettings = ref(false);
 
     const start_value = computed(() => {
       return base2dec(start_value_str.value);
     });
 
     const threshold = computed(() => {
-        if(online.value) {
-            if(notify_victim.value) {
-                return 1000*60*60 * threat_multiplier.value; // 1hour
-            } else {
-                return 1000*60*60*24 * threat_multiplier.value; // 1day
-            }
+      if (online.value) {
+        if (notify_victim.value) {
+          return 1000 * 60 * 60 * threat_multiplier.value; // 1hour
         } else {
-            if(notify_victim.value) {
-                return 1000*60*60 * threat_multiplier.value; // 1hour
-            } else {
-                return 1000*60*60*24*30*12 * threat_multiplier.value; // year
-            }
+          return 1000 * 60 * 60 * 24 * threat_multiplier.value; // 1day
         }
-        return 1;
-    })
+      } else {
+        if (notify_victim.value) {
+          return 1000 * 60 * 60 * threat_multiplier.value; // 1hour
+        } else {
+          return 1000 * 60 * 60 * 24 * 30 * 12 * threat_multiplier.value; // year
+        }
+      }
+      return 1;
+    });
 
     const requestsPerMs = computed(() => {
       return nr_requests.value / 1000;
     });
 
     const alphabet_preset: { [name: string]: string } = {
-      "0-9": "0123456789",
-      "a-z": "abcdefghijklmnopqrstuvwxyz",
-      "0-9a-z": "0123456789abcdefghijklmnopqrstuvwxyz",
-      hex: "0123456789abcdef",
+      numbers: "0123456789",
+      hexadecimal: "0123456789abcdef",
+      alphabet: "abcdefghijklmnopqrstuvwxyz",
+      alphanumeric: "0123456789abcdefghijklmnopqrstuvwxyz",
       base64:
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
       "base64 (urlsafe)":
@@ -358,7 +578,7 @@ export default defineComponent({
     const examples: { [name: string]: Function } = {
       "32bit stack cookie": () => {
         length.value = 6;
-        setAlphabet(alphabet_preset["hex"]);
+        setAlphabet(alphabet_preset["hexadecimal"]);
         nr_requests.value = 3000;
         correct_guesses.value = 1n;
         notify_victim.value = false;
@@ -367,7 +587,7 @@ export default defineComponent({
       },
       "4 digit bank pin": () => {
         length.value = 4;
-        setAlphabet(alphabet_preset["0-9"]);
+        setAlphabet(alphabet_preset["numbers"]);
         nr_requests.value = 1;
         correct_guesses.value = 1n;
         notify_victim.value = true;
@@ -376,7 +596,7 @@ export default defineComponent({
       },
       "6 digit SMS OTP": () => {
         length.value = 6;
-        setAlphabet(alphabet_preset["0-9"]);
+        setAlphabet(alphabet_preset["numbers"]);
         nr_requests.value = 100;
         correct_guesses.value = 1n;
         notify_victim.value = true;
@@ -385,7 +605,7 @@ export default defineComponent({
       },
       "6 digit TOTP": () => {
         length.value = 6;
-        setAlphabet(alphabet_preset["0-9"]);
+        setAlphabet(alphabet_preset["numbers"]);
         nr_requests.value = 100;
         correct_guesses.value = 3n;
         notify_victim.value = false;
@@ -394,7 +614,7 @@ export default defineComponent({
       },
       "Twitter 8 char OTP": () => {
         length.value = 8;
-        setAlphabet(alphabet_preset["0-9a-z"]);
+        setAlphabet(alphabet_preset["alphanumeric"]);
         nr_requests.value = 100;
         correct_guesses.value = 1n;
         notify_victim.value = true;
@@ -412,7 +632,9 @@ export default defineComponent({
       },
       pastebin: () => {
         length.value = 8;
-        setAlphabet(alphabet_preset["0-9a-z"] + "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        setAlphabet(
+          alphabet_preset["alphanumeric"] + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        );
         nr_requests.value = 10_000;
         correct_guesses.value = 95_000_000n / 10n; // 95 million total https://techcrunch.com/2015/12/16/pastebin-the-text-sharing-website-updates-with-an-emphasis-on-code/
         notify_victim.value = false;
@@ -502,11 +724,11 @@ export default defineComponent({
       const N = Number(maxNumber.value);
       const Ex = Number(target_certainty.value);
       const result = 1 / (M / N / Ex);
-      console.log(result)
+      console.log(result);
       return isFinite(result) ? result : Infinity;
     });
 
-    setAlphabet(alphabet_preset["hex"]);
+    setAlphabet(alphabet_preset["hexadecimal"]);
 
     const tailwindcss = {
       theme: {
@@ -563,12 +785,15 @@ export default defineComponent({
       target_ratelimit_requests,
       threshold,
       threat_multiplier,
-      lockout
+      lockout,
+      showSettings,
+      showTab,
     };
   },
   components: {
     slider,
     AttackerItem,
+    OverlayBlock,
   },
 });
 </script>

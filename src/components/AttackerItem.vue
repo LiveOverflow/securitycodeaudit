@@ -1,5 +1,5 @@
 <template>
-  <div class="p-3 m-2 bg-dark rounded rounded-lg">
+  <div class="p-3 bg-dark rounded rounded-lg">
     <div class="font-bold text-lg">{{ name }}</div>
     <div class="text-sm text-white text-opacity-50">
       {{ description }}
@@ -23,24 +23,20 @@
         'to-green': withReplacementTime >= threshold || lockout,
       }"
     >
-      <span v-if="requestsPerMs * 1000 >= 1">
-        {{ requestsPerMs * 1000 }} attempts per second
-      </span>
-      <span v-else> {{ 1 / (requestsPerMs * 1000) }} seconds per attempt </span>
-      <div class="flex-row flex">
+      <div class="flex-row flex justify-center">
         <div>
           {{
             humanizeDuration(withoutReplacementTime, {
-              largest: 2,
+              largest: 1,
               round: true,
             })
           }}
         </div>
-        <div>-</div>
+        <div class="mx-2">-</div>
         <div>
           {{
             humanizeDuration(withReplacementTime, {
-              largest: 2,
+              largest: 1,
               round: true,
             })
           }}
