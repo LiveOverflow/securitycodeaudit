@@ -8,12 +8,12 @@ const routerOptions = {
   routes: [
     {
       path: "/",
-      name: "home",
+      name: "",
       component: BaseView,
       children: [
         {
-          path: "about",
-          name: "about/",
+          path: "/",
+          name: "home",
           // route level code-splitting
           // this generates a separate chunk (About.[hash].js) for this route
           // which is lazy-loaded when the route is visited.
@@ -21,9 +21,21 @@ const routerOptions = {
           props: true,
         },
         {
+          path: "/idor/calculator",
+          name: "idor-calculator",
+          component: () => import("../views/IdorCalculatorView.vue"),
+          props: true,
+        },
+        {
           path: "/idor",
-          name: "idor",
-          component: () => import("../views/IdorView.vue"),
+          name: "idor-examples",
+          component: () => import("../views/IdorExamplesView.vue"),
+          props: true,
+        },
+        {
+          path: "/idor-video",
+          name: "idor-video",
+          component: () => import("../views/IdorVideoView.vue"),
           props: true,
         },
       ],

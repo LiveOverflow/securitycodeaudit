@@ -1,7 +1,7 @@
 <template>
-  <div class="p-3 bg-dark rounded rounded-lg">
+  <div class="p-3 bg-dark rounded rounded-lg flex flex-col">
     <div class="font-bold text-lg">{{ name }}</div>
-    <div class="text-sm text-white text-opacity-50">
+    <div class="text-sm text-white text-opacity-50 flex-grow">
       {{ description }}
     </div>
     <div class="mt-2">
@@ -11,7 +11,7 @@
       <span v-else> {{ 1 / (requestsPerMs * 1000) }} seconds per attempt </span>
     </div>
     <div
-      class="mt-5 transition bg-gradient-to-r rounded rounded-lg py-2 px-3"
+      class="mt-2 transition bg-gradient-to-r rounded rounded-lg py-2 px-3"
       :class="{
         'from-red': withoutReplacementTime < threshold && !notify_victim  && !lockout,
         'from-yellow': withoutReplacementTime < threshold && notify_victim && !lockout,

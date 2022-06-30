@@ -21,7 +21,11 @@ module.exports = {
       },
       dropShadow: {
         '2xlstrong': '0 25px 25px rgba(0, 0, 0, 0.5)',
-      }
+      },
+    },
+    
+    fontFamily: {
+      sans: ["proxima-nova"]
     },
     colors: {
       transparent: "transparent",

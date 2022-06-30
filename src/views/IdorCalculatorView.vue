@@ -1,12 +1,27 @@
 <template>
   <div class="text-white p-5 w-full">
-    <h1 class="text-xl font-bold">IDOR Vuln Calculator</h1>
+    
+    <h1 class="text-xl font-bold">
+      <span class="text-green font-bold">IDOR</span> Vulnerability Calculator
+      
+      
+      
+      </h1>
     <div
       class="text-white float-right cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100"
       @click="showSettings = true"
     >
       <i class="fa-solid fa-gear"></i>
     </div>
+
+    <p class="lg:w-2/3 mt-2">
+      Use the calculator to test how resistant various random identifiers are against bruteforce attacks. 
+      This is applicable to <span class="text-green font-bold">I</span>nsecure 
+      <span class="text-green font-bold">D</span>irect 
+      <span class="text-green font-bold">O</span>bject 
+      <span class="text-green font-bold">R</span>eference vulnerabilities, two-factor authentication or session tokens.
+
+    </p>
 
     <OverlayBlock
       v-if="showSettings"
@@ -59,67 +74,8 @@
       </div>
     </OverlayBlock>
 
-    <div class="mt-12">
-      <div class="sm:hidden bg-dark rounded rounded-lg px-3 py-2 flex flex-row items-center">
-        <label for="tabs" class="sr-only">Select a tab</label>
-        <!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
-        Current View:
-        <select
-        v-model="showTab"
-          id="tabs"
-          name="tabs"
-          class=" flex-grow ml-2 focus:ring-green focus:border-green border-dark rounded-md bg-darker px-1 py-1"
-        >
-          <option :value="1">IDOR Calculator</option>
-          <option :value="2">Browse Examples</option>
-        </select>
-      </div>
-      <div class="hidden sm:block">
-        <div class="border-b border-dark">
-          <nav class="-mb-px flex" aria-label="Tabs">
-            <a
-              @click="showTab = 1"
-              :class="[
-                showTab == 1
-                  ? 'border-green text-green bg-dark'
-                  : 'border-transparent text-white text-opacity-50 hover:text-opacity-100 hover:border-green',
-                'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm cursor-pointer rounded-t rounded-t-lg',
-              ]"
-              :aria-current="showTab == 1 ? 'page' : undefined"
-            >
-              IDOR Calculator
-            </a>
-            <a
-              @click="showTab = 2"
-              :class="[
-                showTab == 2
-                  ? 'border-green text-green bg-dark'
-                  : 'border-transparent text-white text-opacity-50 hover:text-opacity-100 hover:border-green',
-                'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm cursor-pointer rounded-t rounded-t-lg',
-              ]"
-              :aria-current="showTab == 2 ? 'page' : undefined"
-            >
-              Browse Examples
-            </a>
-          </nav>
-        </div>
-      </div>
-    </div>
 
-    <div v-if="showTab == 2">
-      <div>
-        <button
-          class="bg-green px-3 py-1 rounded rouned-lg m-1 border-1 border-green hover:border-white"
-          v-for="e in Object.keys(examples)"
-          @click="examples[e]()"
-          :key="e"
-        >
-          {{ e }}
-        </button>
-      </div>
-    </div>
-
-    <div v-if="showTab == 1">
+    <div >
       <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
         <div
           class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-dark sm:pt-5"
@@ -128,9 +84,7 @@
             for="username"
             class="block text-sm font-medium sm:mt-px sm:pt-2"
           >
-            ID Length (<span class="text-green font-bold">{{ length }}</span
-            >)
-            
+            ID of length <span class="text-green font-bold">{{ length }}</span >
             </label
           >
           <div class="mt-1 sm:mt-0 sm:col-span-2">
@@ -146,6 +100,13 @@
               />
               <span class="font-bold">{{ max_length }}</span>
             </div>
+            <p class="my-2 text-sm text-gray-500">
+              How long is the random value like <span class="font-mono text-white text-opacity-50">{{
+                    dec2base(
+                      start_value + randBigInt2(maxNumber - start_value)
+                    ).padStart(length, alphabet[0])
+                  }}</span>
+            </p>
           </div>
         </div>
 
@@ -153,10 +114,10 @@
           class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
         >
           <label for="about" class="block text-sm font-medium sm:mt-px sm:pt-2">
-            Alphabet (<span class="text-green font-bold">{{
+            Alphabet with <span class="text-green font-bold">{{
               alphabet.length
             }}</span>
-            characters)
+            characters
           </label>
           <div class="mt-1 sm:mt-0 sm:col-span-2">
             <input
@@ -251,7 +212,7 @@
             for="username"
             class="block text-sm font-medium sm:mt-px sm:pt-2"
           >
-            Threat Multiplier (<span
+            Threat Multiplier: <span
               class="text-green font-bold"
               v-if="threat_multiplier < 2"
               >Not Critical</span
@@ -259,7 +220,7 @@
               class="text-yellow font-bold"
               v-else-if="threat_multiplier < 5"
               >Somewhat Critical</span
-            ><span class="text-red font-bold" v-else>Very Critical</span>)
+            ><span class="text-red font-bold" v-else>Very Critical</span>
           </label>
           <div class="mt-1 sm:mt-0 sm:col-span-2">
             <div class="flex flex-row whitespace-nowrap">
@@ -364,40 +325,48 @@
         <div
           class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
         >
-          <h1 class="text-lg font-bold">Results</h1>
+          <h1 class="text-lg font-bold">Results
+<span class="text-sm font-normal text-xs ml-2">
+        <router-link :to="{name: 'idor-calculator', query: {c : directLink}}" 
+      class="text-white cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100">
+        share direct link <i class="fas fa-share ml-1"></i>
+      </router-link>
+      </span>
+
+          </h1>
         </div>
 
         <div
-          class="sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start  sm:pt-5"
+          class="sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start "
         >
           <div
             class="bg-dark sm:col-span-5 md:col-start-2 md:col-end-5 rounded rounded-lg p-5"
           >
-            <div>
-              If every attempt is random, to find one with
-              <i>{{ Math.floor(target_certainty * 100) }}%</i> certainty, you
+          <div>
+            To find one succesfully with
+              <i>{{ Math.floor(target_certainty * 100) }}%</i> certainty ...
+          </div>
+            <div class="ml-4">
+              ... you
               need
               <span class="text-green font-bold"
                 >{{ Math.ceil(binominal_distribution) }} attempts</span
-              >.
-            </div>
-            <div>
-              If you search in a set, to find a specific one with
-              <i>{{ Math.floor(target_certainty * 100) }}%</i> certainty, you
+              > if every attempt is random. <br />
+              ... you
               need
               <span class="text-green font-bold"
                 >{{ Math.ceil(hypergeometric_distribution) }} attempts</span
-              >.
+              > if you search in a set.
             </div>
             <div class="mt-2">
-              With the current threat level it's considered "bad" when your
-              attempts succeed in under
+              With the current threat settings it's considered "bad" when you
+              succeed in under
               <span class="text-green font-bold">{{
                 humanizeDuration(threshold, {
                   largest: 1,
                   round: true,
                 })
-              }}</span>
+              }}</span>.
             </div>
           </div>
         </div>
@@ -409,7 +378,7 @@
         </div>
 
         <div
-          class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4 sm:items-start sm:pt-5"
+          class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4  sm:pt-5"
         >
           <AttackerItem
             v-if="online"
@@ -509,25 +478,62 @@ import humanizeDuration from "humanize-duration";
 import slider from "vue3-slider";
 import AttackerItem from "../components/AttackerItem.vue";
 import OverlayBlock from "../components/OverlayBlock.vue";
+import { storeToRefs } from 'pinia'
+import { useRoute } from 'vue-router';
+import { useIdorStore } from "@/stores/IdorStore"
 
 export default defineComponent({
   props: {},
   setup(props) {
-    const length = ref(6);
+    const store = useIdorStore()
+    const route = useRoute();
     const showTab = ref(1);
-    const max_length = ref(32);
-    const nr_requests = ref(3000);
-    const ip_ratelimit_requests = ref(3000);
-    const target_ratelimit_requests = ref(3000);
-    const notify_victim = ref(false);
-    const online = ref(true);
-    const alphabet = ref("");
-    const start_value_str = ref("");
-    const correct_guesses = ref(1n);
-    const target_certainty = ref(0.95);
-    const threat_multiplier = ref(1);
-    const lockout = ref(false);
     const showSettings = ref(false);
+
+    const { length,
+            max_length,
+            nr_requests,
+            notify_victim,
+            online,
+            alphabet,
+            start_value_str,
+            correct_guesses,
+            target_certainty,
+            threat_multiplier,
+            lockout} = storeToRefs(store)
+
+    console.log(route.query);
+
+    if(route.query?.c?.toString()?.length) {
+      const preset = JSON.parse(atob(route.query?.c.toString()));
+      length.value = Number(preset.l) || length.value
+      max_length.value = Number(preset.ml) || max_length.value
+      nr_requests.value = Number(preset.r) || nr_requests.value
+      notify_victim.value = Boolean(preset.n) || notify_victim.value
+      online.value = Boolean(preset.o) || online.value
+      alphabet.value = preset.a?.toString()  || alphabet.value
+      start_value_str.value = preset.s?.toString() || start_value_str.value
+      correct_guesses.value = BigInt(preset?.c?.toString() || 1n) || correct_guesses.value
+      target_certainty.value = Number(preset.tc) || target_certainty.value
+      threat_multiplier.value = Number(preset.tm) || threat_multiplier.value
+      lockout.value = Boolean(preset.lo) || lockout.value
+    }
+
+    const directLink = computed(() => {
+      return btoa(JSON.stringify({ l: length.value,
+            ml: max_length.value ,
+            r: nr_requests.value ,
+            n: notify_victim.value ,
+            o: online.value ,
+            a: alphabet.value ,
+            s: start_value_str.value ,
+            c: correct_guesses.value.toString() ,
+            tc: target_certainty.value ,
+            tm: threat_multiplier.value ,
+            lo: lockout.value }));
+    })
+
+    
 
     const start_value = computed(() => {
       return base2dec(start_value_str.value);
@@ -565,7 +571,6 @@ export default defineComponent({
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
     };
 
-    const rate_preset: { [name: string]: string } = {};
 
     const setAlphabet = (new_alphabet: string): void => {
       const oldVal = start_value.value;
@@ -574,74 +579,6 @@ export default defineComponent({
     };
 
     // set default
-
-    const examples: { [name: string]: Function } = {
-      "32bit stack cookie": () => {
-        length.value = 6;
-        setAlphabet(alphabet_preset["hexadecimal"]);
-        nr_requests.value = 3000;
-        correct_guesses.value = 1n;
-        notify_victim.value = false;
-        online.value = false;
-        lockout.value = false;
-      },
-      "4 digit bank pin": () => {
-        length.value = 4;
-        setAlphabet(alphabet_preset["numbers"]);
-        nr_requests.value = 1;
-        correct_guesses.value = 1n;
-        notify_victim.value = true;
-        online.value = false;
-        lockout.value = true;
-      },
-      "6 digit SMS OTP": () => {
-        length.value = 6;
-        setAlphabet(alphabet_preset["numbers"]);
-        nr_requests.value = 100;
-        correct_guesses.value = 1n;
-        notify_victim.value = true;
-        online.value = true;
-        lockout.value = false;
-      },
-      "6 digit TOTP": () => {
-        length.value = 6;
-        setAlphabet(alphabet_preset["numbers"]);
-        nr_requests.value = 100;
-        correct_guesses.value = 3n;
-        notify_victim.value = false;
-        online.value = true;
-        lockout.value = false;
-      },
-      "Twitter 8 char OTP": () => {
-        length.value = 8;
-        setAlphabet(alphabet_preset["alphanumeric"]);
-        nr_requests.value = 100;
-        correct_guesses.value = 1n;
-        notify_victim.value = true;
-        online.value = true;
-        lockout.value = false;
-      },
-      "unlisted YouTube": () => {
-        length.value = 11;
-        setAlphabet(alphabet_preset["base64 (urlsafe)"]);
-        nr_requests.value = 10_000;
-        correct_guesses.value = 800_000_000n / 100n; // 800 million total
-        notify_victim.value = false;
-        online.value = true;
-        lockout.value = false;
-      },
-      pastebin: () => {
-        length.value = 8;
-        setAlphabet(
-          alphabet_preset["alphanumeric"] + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        );
-        nr_requests.value = 10_000;
-        correct_guesses.value = 95_000_000n / 10n; // 95 million total https://techcrunch.com/2015/12/16/pastebin-the-text-sharing-website-updates-with-an-emphasis-on-code/
-        notify_victim.value = false;
-        online.value = true;
-        lockout.value = false;
-      },
-    };
 
     const uniqueChars = (str: string) => {
       console.log(str);
@@ -728,8 +665,6 @@ export default defineComponent({
       return isFinite(result) ? result : Infinity;
     });
 
-    setAlphabet(alphabet_preset["hexadecimal"]);
-
     const tailwindcss = {
       theme: {
         colors: {
@@ -777,17 +712,15 @@ export default defineComponent({
       notify_victim,
       hypergeometric_distribution,
       humanizeDuration,
-      examples,
       online,
       max_length,
       tailwindcss,
-      ip_ratelimit_requests,
-      target_ratelimit_requests,
       threshold,
       threat_multiplier,
       lockout,
       showSettings,
       showTab,
+      directLink
     };
   },
   components: {

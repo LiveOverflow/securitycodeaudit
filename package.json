@@ -15,6 +15,7 @@
     "highlight.js": "^11.5.1",
     "humanize-duration": "^3.27.2",
     "mathjax-vue3": "^1.0.1",
+    "pinia": "^2.0.14",
     "vue": "^3.2.37",
     "vue-router": "^4.0.16",
     "vue3-slider": "^1.7.0"
