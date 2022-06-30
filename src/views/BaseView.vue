@@ -21,7 +21,7 @@
         :to="{ name: 'idor-examples' }"
         class="hover:text-opacity-100 transition border-b-2 text-white px-5 py-2"
         :class="
-          $route.matched.some(({ name }) => name?.indexOf('idor-examples') != -1)
+          $route.matched.some(({ name }) => name?.toString().indexOf('idor-examples') != -1)
             ? 'border-green text-opacity-100'
             : 'border-dark text-opacity-50'
         "
@@ -31,7 +31,7 @@
         :to="{ name: 'idor-calculator' }"
         class="hover:text-opacity-100 transition border-b-2 text-white px-5 py-2"
         :class="
-          $route.matched.some(({ name }) => name?.indexOf('idor-calculator') != -1)
+          $route.matched.some(({ name }) => name?.toString().indexOf('idor-calculator') != -1)
             ? 'border-green text-opacity-100'
             : 'border-dark text-opacity-50'
         "
@@ -41,7 +41,7 @@
         :to="{ name: 'idor-video' }"
         class="hover:text-opacity-100 transition border-b-2 text-white px-5 py-2"
         :class="
-          $route.matched.some(({ name }) => name?.indexOf('idor-video') != -1)
+          $route.matched.some(({ name }) => name?.toString().indexOf('idor-video') != -1)
             ? 'border-green text-opacity-100'
             : 'border-dark text-opacity-50'
         "

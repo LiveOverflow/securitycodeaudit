@@ -47,7 +47,7 @@ export default defineComponent({
       const alphabetLen = BigInt(alphabet.value.length);
       while (n != 0n) {
         var q = n % alphabetLen;
-        result = alphabet.value[q] + result;
+        result = alphabet.value[Number(q)] + result;
         n = (n - q) / alphabetLen;
       }
       return result;

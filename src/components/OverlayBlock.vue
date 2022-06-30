@@ -17,7 +17,8 @@
 import { defineComponent, ref, computed, watch } from "vue";
 
 export default defineComponent({
-  props: {},
+  //props: {},
+  emits: ['clickClose'],
   setup(props) {
     return {};
   },
