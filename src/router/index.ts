@@ -51,4 +51,10 @@ const routerOptions = {
 
 const router = createRouter(routerOptions);
 
+router.afterEach((to, from) => {
+  console.log(document.body)
+  document?.body.focus();
+  document?.body.blur();
+})
+
 export default router;

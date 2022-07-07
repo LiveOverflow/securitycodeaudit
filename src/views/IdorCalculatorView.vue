@@ -7,11 +7,18 @@
       
       
       </h1>
-    <div
-      class="text-white float-right cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100"
-      @click="showSettings = true"
-    >
-      <i class="fa-solid fa-gear"></i>
+      <div class="text-white float-right flex flex-row gap-2">
+        
+      <span
+        class="text-white cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100"
+        @click="showSettings = true"
+      >
+        <i class="fa-solid fa-gear"></i>
+      </span>
+      <router-link :to="{name: 'idor-calculator', query: {c : directLink}}" 
+        class="text-white cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100">
+          <i class="fas fa-share ml-1"></i>
+        </router-link>
     </div>
 
     <p class="lg:w-2/3 mt-2">

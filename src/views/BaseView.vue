@@ -2,7 +2,7 @@
   <div
     class="pb-12 mx-auto max-w-screen-xl min-h-screen w-full drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] bg-darker"
   >
-    <nav class="bg-dark text-white text-base flex flex-row pt-1">
+    <nav class="bg-dark text-white text-base flex flex-col md:flex-row pt-1">
       <div class="tracking-wider px-5 py-2">
         <router-link :to="{ name: 'home' }" class="font-bold py-2"
           >SecurityCodeAudit</router-link
@@ -17,36 +17,42 @@
           ><span class="text-green font-bold">.</span>io
         </a>
       </div>
-      <router-link
-        :to="{ name: 'idor-examples' }"
-        class="hover:text-opacity-100 transition border-b-2 text-white px-5 py-2"
-        :class="
-          $route.matched.some(({ name }) => name?.toString().indexOf('idor-examples') != -1)
-            ? 'border-green text-opacity-100'
-            : 'border-dark text-opacity-50'
-        "
-        >Examples</router-link
-      >
-      <router-link
-        :to="{ name: 'idor-calculator' }"
-        class="hover:text-opacity-100 transition border-b-2 text-white px-5 py-2"
-        :class="
-          $route.matched.some(({ name }) => name?.toString().indexOf('idor-calculator') != -1)
-            ? 'border-green text-opacity-100'
-            : 'border-dark text-opacity-50'
-        "
-        >IDOR Calculator</router-link
-      >
-      <router-link
-        :to="{ name: 'idor-video' }"
-        class="hover:text-opacity-100 transition border-b-2 text-white px-5 py-2"
-        :class="
-          $route.matched.some(({ name }) => name?.toString().indexOf('idor-video') != -1)
-            ? 'border-green text-opacity-100'
-            : 'border-dark text-opacity-50'
-        "
-        >Learn</router-link
-      >
+      
+      <DropdownMenuItem route_match="idor" title="IDOR Calculator" :to="{ name: 'idor-calculator' }">
+        <div class="flex flex-col">
+          
+          <router-link
+            :to="{ name: 'idor-video' }"
+            class="hover:text-opacity-100 transition text-white px-5 py-2"
+            :class="
+              $route.matched.some(({ name }) => name?.toString().indexOf('idor-video') != -1)
+                ? 'border-green text-opacity-100'
+                : 'border-dark text-opacity-50'
+            "
+            >Learn More</router-link
+          >
+            <router-link
+            :to="{ name: 'idor-examples' }"
+            class="hover:text-opacity-100 transition text-white px-5 py-2"
+            :class="
+              $route.matched.some(({ name }) => name?.toString().indexOf('idor-examples') != -1)
+                ? 'border-green text-opacity-100'
+                : 'border-dark text-opacity-50'
+            "
+            >Browse Examples</router-link
+          >
+          <router-link
+            :to="{ name: 'idor-calculator' }"
+            class="hover:text-opacity-100 transition text-white px-5 mt-2 mb-5 mx-5 py-2 bg-darker rounded rounded-lg"
+            :class="
+              $route.matched.some(({ name }) => name?.toString().indexOf('idor-calculator') != -1)
+                ? 'border-green text-opacity-100'
+                : 'border-dark text-opacity-50'
+            "
+            ><i class="fa-solid fa-calculator mr-2"></i> Calculator</router-link
+          >
+      </div>
+      </DropdownMenuItem>
     </nav>
     <div class="w-full">
       <RouterView />
@@ -91,4 +97,8 @@
   
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+
+import DropdownMenuItem from "@/components/DropdownMenuItem.vue";
+
+</script>

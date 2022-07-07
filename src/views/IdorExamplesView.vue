@@ -19,9 +19,9 @@
           :key="i"
         >
           <h1 class="font-bold text-xl">{{ e.title }}</h1>
-          <div v-html="e.description" class="my-2 flex-grow text-sm text-white text-opacity-50 hover:text-opacity-100 transition"></div>
+          <div v-html="e.description" class="my-2 flex-grow text-sm text-white text-grey transition"></div>
           <button
-            class="bg-green text-sm px-3 py-2 rounded rouned-lg m-1 border-1 border-green hover:border-white"
+            class="bg-green text-sm px-3 py-2 rounded rouned-lg m-1 border-2 border-green hover:border-white"
             @click="
               e.set();
               $router.push({ name: 'idor-calculator' });
