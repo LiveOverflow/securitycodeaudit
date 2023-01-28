@@ -1,33 +1,33 @@
 <template>
   <div class="text-white p-5 w-full">
-    
     <h1 class="text-xl font-bold">
       <span class="text-green font-bold">IDOR</span> Vulnerability Calculator
-      
-      
-      
-      </h1>
-      <div class="text-white float-right flex flex-row gap-2">
-        
+    </h1>
+    <div class="text-white float-right flex flex-row gap-2">
       <span
         class="text-white cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100"
         @click="showSettings = true"
       >
         <i class="fa-solid fa-gear"></i>
       </span>
-      <router-link :to="{name: 'idor-calculator', query: {c : directLink}}" 
-        class="text-white cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100">
-          <i class="fas fa-share ml-1"></i>
-        </router-link>
+      <router-link
+        :to="{ name: 'idor-calculator', query: { c: directLink } }"
+        class="text-white cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100"
+      >
+        <i class="fas fa-share ml-1"></i>
+      </router-link>
     </div>
 
-    <p class="lg:w-2/3 mt-2">
-      Use the calculator to test how resistant various random identifiers are against bruteforce attacks. 
-      This is applicable to <span class="text-green font-bold">I</span>nsecure 
-      <span class="text-green font-bold">D</span>irect 
-      <span class="text-green font-bold">O</span>bject 
-      <span class="text-green font-bold">R</span>eference vulnerabilities, two-factor authentication or session tokens.
-
+    <p class="lg:w-2/3 mt-5">
+      Use the calculator to test how resistant various random identifiers are
+      against bruteforce attacks. <br />
+      This is applicable to
+      <span
+        class="text-green font-bold"
+        label="Insecure Direct Object Reference"
+        >IDOR</span
+      >
+      vulnerabilities, 2FA tokens, session tokens or generally any random value.
     </p>
 
     <OverlayBlock
@@ -49,16 +49,7 @@
             v-model="max_length"
           />
         </div>
-        <div class="text-sm font-medium sm:mt-px sm:pt-2 pr-10">
-          Start Value
-        </div>
-        <div class="sm:pt-2">
-          <input
-            type="number"
-            class="bg-darker w-full text-right rounded-md px-2 py-1"
-            v-model="start_value_str"
-          />
-        </div>
+
         <div class="text-sm font-medium sm:mt-px sm:pt-2 pr-10">
           Certainty (<span class="text-green font-bold"
             >{{ Math.ceil(target_certainty * 100) }}%</span
@@ -72,17 +63,26 @@
               class="mx-2 accent-green w-full transition-all"
               min="0.01"
               step="0.01"
-              max="0.99"
+              max="1.00"
               v-model.number="target_certainty"
             />
-            <span class="font-bold">99%</span>
+            <span class="font-bold">100%</span>
           </div>
+        </div>
+        <div class="text-sm font-medium sm:mt-px sm:pt-2 pr-10">
+          Start Value
+        </div>
+        <div class="sm:pt-2">
+          <input
+            type="number"
+            class="bg-darker w-full text-right rounded-md px-2 py-1"
+            v-model="start_value_str"
+          />
         </div>
       </div>
     </OverlayBlock>
 
-
-    <div >
+    <div>
       <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
         <div
           class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-dark sm:pt-5"
@@ -91,10 +91,15 @@
             for="username"
             class="block text-sm font-medium sm:mt-px sm:pt-2"
           >
-            ID of length <span class="text-green font-bold">{{ length }}</span >
-            </label
-          >
+            ID of length <span class="text-green font-bold">{{ length }}</span>
+          </label>
           <div class="mt-1 sm:mt-0 sm:col-span-2">
+            <p class="my-2 text-sm text-gray-500">
+              How long is the identifier or random value?
+              <span class="text-green font-bold text-base ml-1">{{
+                length
+              }}</span>
+            </p>
             <div class="flex flex-row whitespace-nowrap">
               <span class="font-bold">2</span>
               <input
@@ -107,13 +112,6 @@
               />
               <span class="font-bold">{{ max_length }}</span>
             </div>
-            <p class="my-2 text-sm text-gray-500">
-              How long is the random value like <span class="font-mono text-white text-opacity-50">{{
-                    dec2base(
-                      start_value + randBigInt2(maxNumber - start_value)
-                    ).padStart(length, alphabet[0])
-                  }}</span>
-            </p>
           </div>
         </div>
 
@@ -121,39 +119,40 @@
           class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
         >
           <label for="about" class="block text-sm font-medium sm:mt-px sm:pt-2">
-            Alphabet with <span class="text-green font-bold">{{
-              alphabet.length
-            }}</span>
+            Alphabet with
+            <span class="text-green font-bold">{{ alphabet.length }}</span>
             characters
           </label>
           <div class="mt-1 sm:mt-0 sm:col-span-2">
+            <p class="my-2 text-sm text-gray-500">
+              List of characters used for the identifier. You can also select a
+              preset:
+            </p>
             <input
-              class="bg-darker px-1 my-1 w-full font-mono text-white text-opacity-50 focus:text-opacity-100"
+              class="bg-darker px-1 mb-1 w-full font-mono text-white text-opacity-50 focus:text-opacity-100"
               type="text"
               v-model="alphabet"
+              ref="alphabet_input"
               @input="
                 () => {
                   alphabet = uniqueChars(alphabet);
                 }
               "
             />
-            <p class="my-2 text-sm text-gray-500">
-              The characters used for the identifier. You can also select a
-              preset:
-            </p>
             <div>
               <button
-                class="px-3 py-1 rounded rouned-lg m-1 border-2 hover:border-white"
-                :class="{
-                  'bg-green border-green':
-                    alphabet == alphabet_preset[alphabet_name],
-                  'bg-dark border-dark':
-                    alphabet != alphabet_preset[alphabet_name],
-                }"
+                class="px-3 py-1 rounded rouned-lg m-1 border-2 hover:border-white bg-dark border-dark"
                 v-for="alphabet_name in Object.keys(alphabet_preset)"
                 @click="setAlphabet(alphabet_preset[alphabet_name])"
               >
                 {{ alphabet_name }}
+              </button>
+
+              <button
+                class="px-3 py-1 rounded rouned-lg m-1 border-2 hover:border-white bg-dark border-dark text-opacity-50"
+                @click="$refs.alphabet_input.focus()"
+              >
+                custom
               </button>
             </div>
           </div>
@@ -219,9 +218,8 @@
             for="username"
             class="block text-sm font-medium sm:mt-px sm:pt-2"
           >
-            Threat Multiplier: <span
-              class="text-green font-bold"
-              v-if="threat_multiplier < 2"
+            Threat Multiplier:
+            <span class="text-green font-bold" v-if="threat_multiplier < 2"
               >Not Critical</span
             ><span
               class="text-yellow font-bold"
@@ -238,18 +236,27 @@
                 :class="{
                   'accent-green': threat_multiplier < 2,
                   'accent-yellow':
-                    threat_multiplier >= 2 && threat_multiplier < 5,
-                  'accent-red': threat_multiplier >= 5,
+                    threat_multiplier >= 2 && threat_multiplier < 7,
+                  'accent-red': threat_multiplier >= 7,
                 }"
-                min="0.01"
-                step="0.01"
+                min="0.001"
+                step="0.005"
                 max="10"
                 v-model="threat_multiplier"
               />
               <span class="text-red font-bold">Very Critical</span>
             </div>
             <p class="mt-2 text-sm text-gray-500">
-              How critical is the data you try to access?
+              How critical is the data you try to access? This affects how long
+              it should take an attacker to succeed (<span
+                class="text-green font-bold"
+                >{{
+                  humanizeDuration(threshold, {
+                    largest: 1,
+                    round: true,
+                  })
+                }}</span
+              >)
             </p>
           </div>
         </div>
@@ -317,9 +324,9 @@
                     />
                   </div>
                   <div class="ml-3 text-sm">
-                    <label for="offers" class="font-medium">Lockout</label>
+                    <label for="offers" class="font-medium">Hard Lockout</label>
                     <p class="text-gray-500">
-                      Is the target system/account locked after some attempts?
+                      System completely locked after some attempts?
                     </p>
                   </div>
                 </div>
@@ -328,42 +335,71 @@
           </div>
         </div>
 
-
         <div
           class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4 sm:items-start sm:border-t sm:border-dark sm:pt-5"
         >
-          <h1 class="text-lg font-bold">Results
-<span class="text-sm font-normal text-xs ml-2">
-        <router-link :to="{name: 'idor-calculator', query: {c : directLink}}" 
-      class="text-white cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100">
-        share direct link <i class="fas fa-share ml-1"></i>
-      </router-link>
-      </span>
-
+          <h1 class="text-lg font-bold">
+            Results
+            <span class="text-sm font-normal text-xs ml-2">
+              <router-link
+                :to="{ name: 'idor-calculator', query: { c: directLink } }"
+                class="text-white cursor-pointer text-opacity-50 hover:text-white hover:text-opacity-100"
+              >
+                share direct link <i class="fas fa-share ml-1"></i>
+              </router-link>
+            </span>
           </h1>
         </div>
 
-        <div
-          class="sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start "
-        >
+        <div class="sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
           <div
             class="bg-dark sm:col-span-5 md:col-start-2 md:col-end-5 rounded rounded-lg p-5"
           >
-          <div>
-            To find one succesfully with
+            <div>
+              To find one succesfully with
               <i>{{ Math.floor(target_certainty * 100) }}%</i> certainty ...
-          </div>
+            </div>
             <div class="ml-4">
-              ... you
-              need
-              <span class="text-green font-bold"
-                >{{ Math.ceil(binominal_distribution) }} attempts</span
-              > if every attempt is random. <br />
-              ... you
-              need
-              <span class="text-green font-bold"
-                >{{ Math.ceil(hypergeometric_distribution) }} attempts</span
-              > if you search in a set.
+              <div>
+                ... you need
+                <span class="text-green font-bold"
+                  >{{
+                    binominal_distribution !== Infinity
+                      ? Math.ceil(binominal_distribution)
+                      : `∞`
+                  }}
+                  attempts</span
+                >
+                if every attempt is random.
+                <span
+                  v-if="
+                    hypergeometric_distribution !== Infinity ||
+                    hypergeometric_distribution < 3075840000000000
+                  "
+                >
+                  It's impossible!
+                </span>
+              </div>
+              <div>
+                ... you need
+                <span class="text-green font-bold"
+                  >{{
+                    hypergeometric_distribution !== Infinity
+                      ? Math.ceil(hypergeometric_distribution)
+                      : `∞`
+                  }}
+                  attempts</span
+                >
+                if you search in a set.
+                <span
+                  v-if="
+                    hypergeometric_distribution !== Infinity ||
+                    hypergeometric_distribution < 3075840000000000
+                  "
+                >
+                  It's impossible!
+                </span>
+              </div>
             </div>
             <div class="mt-2">
               With the current threat settings it's considered "bad" when you
@@ -373,19 +409,20 @@
                   largest: 1,
                   round: true,
                 })
-              }}</span>.
+              }}</span
+              >.
             </div>
           </div>
         </div>
 
         <div
-          class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4 sm:items-start  sm:pt-5"
+          class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4 sm:items-start sm:pt-5"
         >
           <h1 class="text-md font-bold">Simulated Attackers</h1>
         </div>
 
         <div
-          class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4  sm:pt-5"
+          class="grid sm:grid-cols-2 md:grid-cols-3 lg:sm:grid-cols-4 gap-4 sm:pt-5"
         >
           <AttackerItem
             v-if="online"
@@ -485,62 +522,68 @@ import humanizeDuration from "humanize-duration";
 import slider from "vue3-slider";
 import AttackerItem from "../components/AttackerItem.vue";
 import OverlayBlock from "../components/OverlayBlock.vue";
-import { storeToRefs } from 'pinia'
-import { useRoute } from 'vue-router';
-import { useIdorStore } from "@/stores/IdorStore"
+import { storeToRefs } from "pinia";
+import { useRoute } from "vue-router";
+import { useIdorStore } from "@/stores/IdorStore";
 
 export default defineComponent({
   props: {},
   setup(props) {
-    const store = useIdorStore()
+    const store = useIdorStore();
     const route = useRoute();
     const showTab = ref(1);
     const showSettings = ref(false);
 
-    const { length,
-            max_length,
-            nr_requests,
-            notify_victim,
-            online,
-            alphabet,
-            start_value_str,
-            correct_guesses,
-            target_certainty,
-            threat_multiplier,
-            lockout} = storeToRefs(store)
+    const {
+      length,
+      max_length,
+      nr_requests,
+      notify_victim,
+      online,
+      alphabet,
+      start_value_str,
+      correct_guesses,
+      target_certainty,
+      threat_multiplier,
+      lockout,
+    } = storeToRefs(store);
+    console.log("value: " + alphabet.value);
 
     console.log(route.query);
 
-    if(route.query?.c?.toString()?.length) {
+    if (route.query?.c?.toString()?.length) {
       const preset = JSON.parse(atob(route.query?.c.toString()));
-      length.value = Number(preset.l) || length.value
-      max_length.value = Number(preset.ml) || max_length.value
-      nr_requests.value = Number(preset.r) || nr_requests.value
-      notify_victim.value = Boolean(preset.n) || notify_victim.value
-      online.value = Boolean(preset.o) || online.value
-      alphabet.value = preset.a?.toString()  || alphabet.value
-      start_value_str.value = preset.s?.toString() || start_value_str.value
-      correct_guesses.value = BigInt(preset?.c?.toString() || 1n) || correct_guesses.value
-      target_certainty.value = Number(preset.tc) || target_certainty.value
-      threat_multiplier.value = Number(preset.tm) || threat_multiplier.value
-      lockout.value = Boolean(preset.lo) || lockout.value
+      length.value = Number(preset.l) || length.value;
+      max_length.value = Number(preset.ml) || max_length.value;
+      nr_requests.value = Number(preset.r) || nr_requests.value;
+      notify_victim.value = Boolean(preset.n) || notify_victim.value;
+      online.value = Boolean(preset.o) || online.value;
+      alphabet.value = preset.a?.toString() || alphabet.value;
+      start_value_str.value = preset.s?.toString() || start_value_str.value;
+      correct_guesses.value =
+        BigInt(preset?.c?.toString() || 1n) || correct_guesses.value;
+      target_certainty.value = Number(preset.tc) || target_certainty.value;
+      threat_multiplier.value = Number(preset.tm) || threat_multiplier.value;
+      lockout.value = Boolean(preset.lo) || lockout.value;
     }
 
     const directLink = computed(() => {
-      return btoa(JSON.stringify({ l: length.value,
-            ml: max_length.value ,
-            r: nr_requests.value ,
-            n: notify_victim.value ,
-            o: online.value ,
-            a: alphabet.value ,
-            s: start_value_str.value ,
-            c: correct_guesses.value.toString() ,
-            tc: target_certainty.value ,
-            tm: threat_multiplier.value ,
-            lo: lockout.value }));
-    })
-
-    
+      return btoa(
+        JSON.stringify({
+          l: length.value,
+          ml: max_length.value,
+          r: nr_requests.value,
+          n: notify_victim.value,
+          o: online.value,
+          a: alphabet.value,
+          s: start_value_str.value,
+          c: correct_guesses.value.toString(),
+          tc: target_certainty.value,
+          tm: threat_multiplier.value,
+          lo: lockout.value,
+        })
+      );
+    });
 
     const start_value = computed(() => {
       return base2dec(start_value_str.value);
@@ -578,8 +621,8 @@ export default defineComponent({
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
     };
 
-
     const setAlphabet = (new_alphabet: string): void => {
+      if (new_alphabet === undefined) return;
       const oldVal = start_value.value;
       alphabet.value = new_alphabet;
       start_value_str.value = dec2base(oldVal);
@@ -593,6 +636,11 @@ export default defineComponent({
     };
 
     const maxNumber = computed(() => {
+      console.log("xxxx");
+      console.log(alphabet.value);
+      console.log(length.value);
+      console.log(start_value.value);
+      console.log("xxxx");
       return (
         BigInt(alphabet.value.length) ** BigInt(length.value) -
         start_value.value
@@ -727,7 +775,7 @@ export default defineComponent({
       lockout,
       showSettings,
       showTab,
-      directLink
+      directLink,
     };
   },
   components: {

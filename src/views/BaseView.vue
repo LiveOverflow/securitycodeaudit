@@ -17,88 +17,94 @@
           ><span class="text-green font-bold">.</span>io
         </a>
       </div>
-      
-      <DropdownMenuItem route_match="idor" title="IDOR Calculator" :to="{ name: 'idor-calculator' }">
-        <div class="flex flex-col">
-          
+
+      <DropdownMenuItem
+        route_match="idor"
+        title="IDOR Calculator"
+        :to="{ name: 'idor-calculator' }"
+      >
+        <div class="flex flex-col mb-2">
           <router-link
             :to="{ name: 'idor-video' }"
-            class="hover:text-opacity-100 transition text-white px-5 py-2"
+            class="hover:text-opacity-100 transition text-opacity-50 hover:text-green px-5 py-2"
             :class="
-              $route.matched.some(({ name }) => name?.toString().indexOf('idor-video') != -1)
-                ? 'border-green text-opacity-100'
+              $route.matched.some(
+                ({ name }) => name?.toString().indexOf('idor-video') != -1
+              )
+                ? 'border-green text-opacity-100 text-green font-bold'
                 : 'border-dark text-opacity-50'
             "
             >Learn More</router-link
           >
-            <router-link
+          <router-link
             :to="{ name: 'idor-examples' }"
-            class="hover:text-opacity-100 transition text-white px-5 py-2"
+            class="hover:text-opacity-100 transition text-opacity-50 hover:text-green px-5 py-2"
             :class="
-              $route.matched.some(({ name }) => name?.toString().indexOf('idor-examples') != -1)
-                ? 'border-green text-opacity-100'
+              $route.matched.some(
+                ({ name }) => name?.toString().indexOf('idor-examples') != -1
+              )
+                ? 'border-green text-opacity-100 text-green font-bold'
                 : 'border-dark text-opacity-50'
             "
             >Browse Examples</router-link
           >
           <router-link
             :to="{ name: 'idor-calculator' }"
-            class="hover:text-opacity-100 transition text-white px-5 mt-2 mb-5 mx-5 py-2 bg-darker rounded rounded-lg"
+            class="hover:text-opacity-100 transition text-opacity-50 hover:text-green px-5 py-2"
             :class="
-              $route.matched.some(({ name }) => name?.toString().indexOf('idor-calculator') != -1)
-                ? 'border-green text-opacity-100'
+              $route.matched.some(
+                ({ name }) => name?.toString().indexOf('idor-calculator') != -1
+              )
+                ? 'border-green text-opacity-100 text-green font-bold'
                 : 'border-dark text-opacity-50'
             "
             ><i class="fa-solid fa-calculator mr-2"></i> Calculator</router-link
           >
-      </div>
+        </div>
       </DropdownMenuItem>
     </nav>
     <div class="w-full">
       <RouterView />
     </div>
     <footer class="border-t-4 border-dark w-full text-white mt-5">
-    <div class="pl-6 mr-5 my-4 py-3 opacity-60">
-      <div class="mb-1 text-base">
-        <a
-          href="https://twitter.com/hextreeio"
-          target="_blank"
-          class="text-white hover:text-green mr-2"
-        >
-          <i class="fab fa-twitter" />
-        </a>
-        <a
-          href="https://instagram.com/hextreeio"
-          target="_blank"
-          class="text-white hover:text-green mr-2"
-        >
-          <i class="fab fa-instagram" />
-        </a>
-        <a
-          href="https://youtube.com/LiveOverflow"
-          target="_blank"
-          class="text-white hover:text-green mr-2"
-        >
-          <i class="fab fa-youtube" />
-        </a>
+      <div class="pl-6 mr-5 my-4 py-3 opacity-60">
+        <div class="mb-1 text-base">
+          <a
+            href="https://twitter.com/hextreeio"
+            target="_blank"
+            class="text-white hover:text-green mr-2"
+          >
+            <i class="fab fa-twitter" />
+          </a>
+          <a
+            href="https://instagram.com/hextreeio"
+            target="_blank"
+            class="text-white hover:text-green mr-2"
+          >
+            <i class="fab fa-instagram" />
+          </a>
+          <a
+            href="https://youtube.com/LiveOverflow"
+            target="_blank"
+            class="text-white hover:text-green mr-2"
+          >
+            <i class="fab fa-youtube" />
+          </a>
+        </div>
+        <div class="text-xs">
+          <a
+            href="https://www.hextree.io/legal"
+            class="text-white hover:text-green"
+            target="_blank"
+            >&copy; {{ new Date().getFullYear() }} hextree.io. All rights
+            reserved. Imprint.</a
+          >
+        </div>
       </div>
-      <div class="text-xs">
-        <a
-          href="https://www.hextree.io/legal"
-          class="text-white hover:text-green"
-          target="_blank"
-          >&copy; {{ new Date().getFullYear() }} hextree.io. All rights
-          reserved. Imprint.</a
-        >
-      </div>
-    </div>
-  </footer>
+    </footer>
   </div>
-  
 </template>
 
 <script setup lang="ts">
-
 import DropdownMenuItem from "@/components/DropdownMenuItem.vue";
-
 </script>
